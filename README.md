@@ -18,12 +18,6 @@ Point it at any git repo. Tell it what "better" means — more tests, fewer bugs
 
 On April 4, 2026, **evo released itself.** [v0.26.2](https://github.com/ntholm86/evo-releases/releases) was analyzed, implemented, benchmarked, and published entirely by evo's own pipeline — the first version where the engine completed the full self-improvement loop without human intervention.
 
-<p align="center">
-  <img src="assets/self-improve-v0.26.2.png" alt="evo self-improve completing v0.26.2 — 1/3 merged, $1.91 total cost" width="720">
-  <br>
-  <em>evo self-improve completing the v0.26.2 release — 3 iterations, 1 merged, fully autonomous</em>
-</p>
-
 It doesn't just generate code. It **evolves codebases** — including its own.
 
 ---
@@ -227,6 +221,11 @@ On **MERGE**, the branch is squash-merged with a structured commit message (metr
 ## Self-Improvement
 
 This is what evo was built for. It can improve its own source code, using its own output quality as the fitness function.
+
+<p align="center">
+  <img src="assets/self-improve-v0.26.2.jpg" alt="evo v0.26.2 self-improvement run — 3 iterations, 1 merged, $1.91 total cost" width="700">
+  <br><em>v0.26.2 self-improvement run: 3 iterations, 1 merged at 33% merge rate, $1.91 total cost.</em>
+</p>
 
 ### The Loop
 
