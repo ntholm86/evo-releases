@@ -57,6 +57,35 @@ v0.23.0, 3 iterations per repo, Claude Haiku (~$0.04/run):
 
 Each iteration creates a branch, makes one focused change, and only merges if it's a strict improvement. Failed attempts are rejected and logged — evo learns from them.
 
+## Branch naming & workflow
+
+Every evo iteration creates a branch with a deterministic name:
+
+```
+evo/{NNN}-{slug}
+```
+
+- `NNN` — zero-padded iteration number (001, 002, …)
+- `slug` — sanitized proposal description (e.g. `add-edge-case-tests-for-divide`)
+
+**Examples:**
+```
+evo/001-add-input-validation-to-parse-config
+evo/002-test-coverage-for-metric-aggregation
+evo/003-harden-error-handling-in-git-module
+```
+
+**Lifecycle:** branch is created → LLM writes code → build check → tests run → Pareto gate evaluates. On **MERGE**, the branch is squash-merged into `master` with a structured commit message containing metrics, proof hash, and cost. On **REJECT**, the branch is deleted — nothing touches `master`.
+
+**Strategy** determines *what kind* of proposals get generated:
+
+| Strategy | Branch proposals target |
+|----------|------------------------|
+| `test_coverage` | Missing tests, edge cases, untested paths |
+| `hardening` | Bug fixes, input validation, error handling |
+| `balanced` | Mix of tests + hardening + quality |
+| `full_auto` | LLM decides autonomously what to improve |
+
 ## Install
 
 Download the latest `.whl` from [Releases](https://github.com/ntholm86/evo-releases/releases/latest), then:
