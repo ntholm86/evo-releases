@@ -75,11 +75,24 @@ evo init                            # scaffold .evo.yaml interactively
 evo run --iterations 5 --no-sandbox # let it go
 ```
 
-Or try the bundled demo projects to see evo in action:
+Or try it on a small project in seconds:
 
 ```bash
-# Clone evo, then run against a demo
-cd demo/mathkit
+# Create a minimal Python project
+mkdir mykit && cd mykit && git init
+cat > .evo.yaml <<EOF
+project: mykit
+language: python
+metrics:
+  test: "python -m pytest --tb=short -q"
+EOF
+mkdir src tests
+echo 'def add(a, b): return a + b' > src/math.py
+echo 'from src.math import add
+def test_add(): assert add(1, 2) == 3' > tests/test_math.py
+git add -A && git commit -m "init"
+
+# Let evo evolve it
 evo run --iterations 3 --no-sandbox
 ```
 
