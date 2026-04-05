@@ -45,14 +45,20 @@ It doesn't just generate code. It **evolves codebases** — including its own.
 Download the latest `.whl` from [Releases](https://github.com/ntholm86/evo-releases/releases/latest):
 
 ```bash
+# Recommended — handles PATH automatically
+pipx install evo_engine-*.whl
+
+# Or with pip (you may need to add the scripts directory to PATH)
 pip install evo_engine-*.whl
 ```
 
-Or install with OpenAI support:
+With OpenAI support:
 
 ```bash
-pip install "evo_engine-*.whl[openai]"
+pipx install "evo_engine-*.whl[openai]"
 ```
+
+> **Don't have pipx?** `pip install pipx` then `pipx ensurepath` and restart your terminal.
 
 ### Requirements
 
