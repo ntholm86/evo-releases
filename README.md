@@ -75,40 +75,22 @@ pipx install "evo_engine-*.whl[openai]"
 # 1. Set your API key (the .env file is auto-loaded)
 echo "ANTHROPIC_API_KEY=your-key" > .env
 
-# 2. Run against any repo
+# 2. Run against any repo — zero config
 cd /path/to/your/project
-evo init                            # scaffold .evo.yaml interactively
-evo run --iterations 5 --no-sandbox # let it go
+evo run --no-sandbox
 ```
 
-Or try it on a small project in seconds:
+evo auto-detects your language, test command, and project structure. No config file needed.
 
-```bash
-# Create a minimal Python project
-mkdir mykit && cd mykit && git init
-cat > .evo.yaml <<EOF
-project: mykit
-language: python
-metrics:
-  test: "python -m pytest --tb=short -q"
-EOF
-mkdir src tests
-echo 'def add(a, b): return a + b' > src/math.py
-echo 'from src.math import add
-def test_add(): assert add(1, 2) == 3' > tests/test_math.py
-git add -A && git commit -m "init"
-
-# Let evo evolve it
-evo run --iterations 3 --no-sandbox
-```
-
-Watch evo analyze the codebase, find weaknesses, write code, run tests, and merge improvements — all on its own.
+Want more control? Run `evo init` to scaffold a `.evo.yaml` with auto-detected defaults, then customize.
 
 ---
 
 ## Configuration
 
-evo is configured via a `.evo.yaml` file in the target repo root. Run `evo init` to generate one interactively, or create it by hand.
+**No config needed.** With `--no-sandbox`, evo auto-detects your language, test command, and scopes from the project files. Just run `evo run --no-sandbox`.
+
+For more control, create a `.evo.yaml` in the target repo root — via `evo init` (interactive, with auto-detected defaults) or by hand.
 
 ### Minimal
 
