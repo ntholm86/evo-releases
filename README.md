@@ -29,13 +29,13 @@ It doesn't just generate code. It **evolves codebases** — including its own.
 ## What makes evo different
 
 - **Zero human intervention** — analyze → propose → implement → verify → decide → merge. No prompting, no code review, no copy-paste.
-- **Regression-proof** — Every change passes a Pareto gate. If *any* metric regresses — tests, lint, coverage, security — the change is rejected. Period.
+- **Regression-proof** — Every change passes a Pareto gate. If *any* metric regresses — tests, lint, coverage, security — the change is rejected. Duration metrics use adaptive tolerance that understands measurement noise and the natural cost of adding tests.
 - **Self-improving** — evo uses its own merge rate as a fitness function and can evolve *its own source code*. The engine that writes code can rewrite itself.
 - **Self-correcting** — When tests fail, evo diagnoses whether the *test* or the *source* is wrong and auto-retries with the fix. Floating-point precision, platform-specific behavior, off-by-one errors — caught and fixed automatically.
 - **Tamper-evident audit trail** — A hash-chained proof ledger records every decision. Immutable. Verifiable. Run `evo status` to check chain integrity.
 - **Multi-language** — Python, TypeScript, JavaScript, C#, with automatic detection for Go, Rust, and Ruby. Auto-detects test frameworks, linters, and type checkers.
 - **Multi-provider** — Anthropic (Claude) and OpenAI (GPT/o-series). Mix models per pipeline phase — cheap models for simple tasks, strong models where accuracy matters.
-- **Statistically rigorous** — Noisy metrics use Welch's t-test instead of naive comparison. No false positives from measurement noise.
+- **Statistically rigorous** — Noisy metrics use Welch's t-test with multiple-comparison correction instead of naive comparison. No false positives from measurement noise.
 - **Cross-repo learning** — Diagnostic insights and success rate statistics transfer between repos, so evo gets better the more codebases it works on.
 
 ---
@@ -209,6 +209,8 @@ The DECIDE phase is strict: **no metric may get worse, and at least one must get
 - +15 tests, lint unchanged → **MERGE**
 - Nothing changed → **REJECT**
 
+Duration metrics use adaptive tolerance — an absolute floor absorbs measurement noise, and test-count awareness forgives the natural cost of adding tests. Noisy benchmarks can use statistical testing so only real regressions trigger rejection.
+
 evo doesn't ship "probably fine." It ships "provably not worse."
 
 ### The Diagnosis Loop
@@ -217,20 +219,19 @@ When tests fail after IMPLEMENT, evo doesn't just give up:
 
 | Diagnosis | Meaning | Action |
 |-----------|---------|--------|
-| `BUG_FOUND` | Real bug in the source code | Fix applied directly |
-| `TEST_ASSUMPTION_WRONG` | Test has incorrect expectations | Test rewritten |
-| `RISK_ESCALATION` | Change is too dangerous | Reject immediately |
+| `bug_found` | Real bug in the source code | Fix applied directly |
+| `test_wrong` | Test has incorrect expectations | Test rewritten |
 
-This makes evo self-correcting within each iteration.
+Up to 3 diagnosis cycles per iteration. The current cycle is visible in the live status bar so you always know where evo is.
 
 ### Branch Naming
 
-Every iteration gets a deterministic branch name:
+Every iteration gets a timestamped branch name:
 
 ```
-evo/001-add-input-validation-to-parse-config
-evo/002-test-coverage-for-metric-aggregation
-evo/003-harden-error-handling-in-git-module
+evo/260405-103000-001-add-input-validation-to-parse-config
+evo/260405-103142-002-test-coverage-for-metric-aggregation
+evo/260405-103400-003-harden-error-handling-in-git-module
 ```
 
 On **MERGE**, the branch is squash-merged with a structured commit message (metrics, proof hash, cost). On **REJECT**, a `DEAD END:` commit preserves the context in git history.
@@ -280,8 +281,8 @@ When a self-improvement iteration passes the benchmark gate, evo merges the chan
 
 When evo detects it's running on its own repo:
 
-- **Safety-critical modules are locked** — decide, release, proof, git, sandbox can't be modified
-- **Stronger models activate** — analyze and implement auto-escalate to Sonnet
+- **Safety-critical infrastructure is locked** — core decision logic, proof ledger, release mechanics, and sandbox isolation can't be modified
+- **Stronger models activate** — analyze and implement auto-escalate to the strongest available model
 - **Benchmark gating** — changes must improve the score across demo repos, not just pass evo's own tests
 - **Lessons memory** — failed approaches are recorded so evo doesn't repeat them
 
@@ -289,8 +290,8 @@ When evo detects it's running on its own repo:
 
 evo builds knowledge that transfers between codebases:
 
-- **Lessons** — diagnostic insights (test failures, platform quirks) are shared across repos within a benchmark run
-- **Genomes** — statistical success rates per proposal category, language, and coverage level — injected into prompts so the LLM prioritizes what actually works
+- **Lessons** — diagnostic insights (test failures, platform quirks, pattern corrections) are shared across repos within a benchmark run. A failure pattern discovered in one codebase helps avoid the same mistake in the next.
+- **Genomes** — statistical success rates per proposal category, language, and project maturity level — injected into prompts so the LLM prioritizes what actually works. Genes adapt automatically as more data accumulates, splitting into finer-grained strategies when the evidence supports it.
 
 Manage with `evo lessons` and `evo genomes`.
 
