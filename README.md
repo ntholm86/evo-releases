@@ -415,4 +415,4 @@ For unknown languages, evo can **infer a profile via LLM** — detecting test pa
 
 ## License
 
-MIT
+MIT — Copyright (c) 2025-2026 Nils Wendelboe Holmager
